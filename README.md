@@ -72,7 +72,7 @@ src/
     └── kafka/                     # Producer, Consumer
 ```
 
-# ERP
+# 🧬 ERD
 
 <img width="951" height="1117" alt="이커머스 (1)" src="https://github.com/user-attachments/assets/bb95ffb4-dbe0-4d2b-ae20-516ea5ca30b3" />
 
