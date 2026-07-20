@@ -40,7 +40,7 @@ src/
 ├── global/                        # 전역 공통 모듈
 │   ├── common/                    # BaseEntity, 공통 Enum
 │   ├── exception/                 # ErrorCode, GlobalExceptionHandler
-│   ├── config/                    # DB, Redis, Kafka, ES 설정 클래스
+│   ├── config/                    # DB, Redis, Kafka, ES, Scheduling 설정 클래스
 │   └── util/                      # CommonResponse
 │
 ├── member/
@@ -49,26 +49,40 @@ src/
 │   ├── dto/                       # MemberRequest, MemberResponse
 │   └── infrastructure/            # MemberJpaRepository
 │
-├── product/                       # [Command]
-│   ├── domain/                    # Product, ProductOption, Category 
+├── product/                        
+│   ├── domain/                    # Product, ProductOption, Category
 │   ├── application/               # ProductService
 │   ├── dto/                       # ProductRequest, ProductResponse, CategoryRequest...
 │   └── infrastructure/            # ProductJpaRepository
 │
+├── stock/                         # 재고 증감 이력 관리
+│   ├── domain/                    # StockLog Entity, StockLogType
+│   ├── application/               # StockService (reserve/release/confirm, Redis 분산락으로 감쌈)
+│   ├── dto/                       # StockReserveRequest, StockReleaseRequest
+│   └── infrastructure/            # StockLogJpaRepository
+│
 ├── search/                        # [Query - Elasticsearch 전용]
-│   ├── domain/                    # SearchProduct 
-│   ├── application/               # SearchService 
+│   ├── domain/                    # SearchProduct
+│   ├── application/               # SearchService
 │   ├── dto/                       # SearchRequest, SearchResponse
-│   └── infrastructure/            # ElasticsearchRepository 
+│   └── infrastructure/            # ElasticsearchRepository
 │
 ├── order/
-│   ├── domain/                    # Order, OrderItem, Outbox
-│   ├── application/               # OrderService
+│   ├── domain/                    # Order, OrderItem
+│   ├── application/               # OrderService, OrderExpirationScheduler
 │   ├── dto/                       # OrderRequest, OrderResponse
 │   └── infrastructure/            # OrderJpaRepository
 │
+├── payment/
+│   ├── domain/                    # Payment Entity
+│   ├── application/               # PaymentService, MockPgClient
+│   ├── dto/                       # PaymentRequest, PaymentResponse
+│   └── infrastructure/            # PaymentJpaRepository
+│
 └── messaging/
-    ├── event/                     # ProductCreatedEvent 
+    ├── domain/                    # Outbox, ConsumedEvent
+    ├── application/               # OutboxPublisher (폴링 퍼블리셔, 추후 Debezium CDC로 대체)
+    ├── event/                     # ProductCreatedEvent, OrderPaidEvent, OrderCancelledEvent
     └── kafka/                     # Producer, Consumer
 ```
 
