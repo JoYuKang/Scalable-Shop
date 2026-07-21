@@ -9,6 +9,7 @@
 - **고성능 상품 검색 및 전문 분석**: Elasticsearch를 도입하여 초성 검색 및 형태소 분석을 지원하며, 랭킹 스코어 기반의 인기순/판매순 등 복합 정렬 기능을 제공합니다.
 - **역할 기반 권한 제어**: User, Seller, Admin 권한을 분리하고 인터셉터를 통해 보안 및 접근 제어를 수행합니다.
 
+
 ## 🛠 Quick Start (Infra)
 
 본 프로젝트는 Docker를 통해 개발 및 테스트에 필요한 인프라 환경을 자동으로 구성합니다.
@@ -88,9 +89,24 @@ src/
 
 # 🧬 ERD
 
-<img width="951" height="1117" alt="이커머스 (1)" src="https://github.com/user-attachments/assets/bb95ffb4-dbe0-4d2b-ae20-516ea5ca30b3" />
+<!-- <img width="951" height="1117" alt="이커머스 (1)" src="https://github.com/user-attachments/assets/bb95ffb4-dbe0-4d2b-ae20-516ea5ca30b3" /> -->
+<img width="1191" height="1014" alt="Untitled" src="https://github.com/user-attachments/assets/f64eb184-1e74-4f3c-b1f5-aa342b05b161" />
+
+--- 
+## 📦 재고 상태 정책
+
+product_option.stock_quantity는 현재 구매 가능한 수량을 그대로 나타냅니다. 별도의 "예약중 수량" 카운터를 두지 않고, 모든 재고 변동을 stock_log에 append-only로 남기는 방식입니다.
+
+## 💳 결제 도메인
+
+실제 PG 연동 대신 Mock PG로 결제를 흉내냅니다. payment.order_id는 1:N으로 두어 재시도 흐름(실패 → 재시도 → 성공)을 모두 별도 행으로 남깁니다.
 
 
+pg_tid: Mock PG가 반환하는 가상 거래 ID
+status: READY / SUCCESS / FAILED / CANCELLED
+approved_at, fail_reason: 각각 승인 시각, 실패 사유 (Mock PG 결과에 따라 기록)
 
+## 🔍 검색-구매 시점 정합성
 
+Elasticsearch 조회 결과는 참고용입니다. MySQL의 재고 변경이 Kafka를 거쳐 색인에 반영되기까지 지연이 있을 수 있어, 검색 결과에는 재고가 있어 보여도 실제로는 이미 품절일 수 있습니다
 
