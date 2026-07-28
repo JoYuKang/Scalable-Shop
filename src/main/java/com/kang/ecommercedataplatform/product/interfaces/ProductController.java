@@ -1,5 +1,6 @@
-package com.kang.ecommercedataplatform.product.application;
+package com.kang.ecommercedataplatform.product.interfaces;
 
+import com.kang.ecommercedataplatform.product.application.ProductService;
 import com.kang.ecommercedataplatform.product.dto.ProductCreateRequest;
 import com.kang.ecommercedataplatform.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.kang.ecommercedataplatform.product.application;
 
-import com.kang.ecommercedataplatform.order.infrastructure.MemberJpaRepository;
+import com.kang.ecommercedataplatform.member.infrastructure.MemberJpaRepository;
 import com.kang.ecommercedataplatform.product.infrastructure.ProductJpaRepository;
 import com.kang.ecommercedataplatform.member.domain.Member;
 import com.kang.ecommercedataplatform.product.domain.Category;
@@ -12,6 +12,11 @@ import com.kang.ecommercedataplatform.product.dto.ProductResponse;
 import com.kang.ecommercedataplatform.product.infrastructure.CategoryJpaRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import com.kang.ecommercedataplatform.product.infrastructure.ProductOptionJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +29,7 @@ public class ProductService {
     private final ProductJpaRepository productJpaRepository;
     private final CategoryJpaRepository categoryJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
+    private final ProductOptionJpaRepository productOptionJpaRepository;
 
     @Transactional
     public Long createProduct(ProductCreateRequest request) {
@@ -62,5 +68,14 @@ public class ProductService {
         return productJpaRepository.findAll().stream()
                 .map(ProductResponse::from)
                 .toList();
+    }
+
+    // OrderFacade
+    public Map<Long, ProductOption> getOptionsForOrder(List<Long> optionIds) {
+        List<ProductOption> options = productOptionJpaRepository.findAllById(optionIds);
+        if (options.size() != optionIds.size()) {
+            throw new IllegalArgumentException("존재하지 않는 상품 옵션이 포함되어 있습니다.");
+        }
+        return options.stream().collect(Collectors.toMap(ProductOption::getId, Function.identity()));
     }
 }

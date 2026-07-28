@@ -1,4 +1,4 @@
-package com.kang.ecommercedataplatform.order.infrastructure;
+package com.kang.ecommercedataplatform.member.infrastructure;
 
 import com.kang.ecommercedataplatform.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
