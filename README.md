@@ -45,21 +45,21 @@ src/
 │   └── util/                      # CommonResponse
 │
 ├── member/
-│   ├── domain/                    # Member Entity
+│   ├── domain/                    # Member Entity, MemberRole
 │   ├── application/               # MemberService
 │   ├── dto/                       # MemberRequest, MemberResponse
 │   └── infrastructure/            # MemberJpaRepository
 │
-├── product/                        
-│   ├── domain/                    # Product, ProductOption, Category
+├── product/
+│   ├── domain/                    # Product, ProductOption, Category, ProductStatus
 │   ├── application/               # ProductService
-│   ├── dto/                       # ProductRequest, ProductResponse, CategoryRequest...
-│   └── infrastructure/            # ProductJpaRepository
+│   ├── dto/                       # ProductCreateRequest, ProductOptionRequest, ProductResponse, ProductOptionResponse
+│   ├── infrastructure/            # ProductJpaRepository, CategoryJpaRepository, ProductOptionJpaRepository
+│   └── interfaces/                # ProductController
 │
 ├── stock/                         # 재고 증감 이력 관리
 │   ├── domain/                    # StockLog Entity, StockLogType
-│   ├── application/               # StockService (reserve/release/confirm, Redis 분산락으로 감쌈)
-│   ├── dto/                       # StockReserveRequest, StockReleaseRequest
+│   ├── application/               # StockService (reserve/release - 락은 OrderFacade가 감싸서 호출)
 │   └── infrastructure/            # StockLogJpaRepository
 │
 ├── search/                        # [Query - Elasticsearch 전용]
@@ -69,10 +69,11 @@ src/
 │   └── infrastructure/            # ElasticsearchRepository
 │
 ├── order/
-│   ├── domain/                    # Order, OrderItem
-│   ├── application/               # OrderService, OrderExpirationScheduler
-│   ├── dto/                       # OrderRequest, OrderResponse
-│   └── infrastructure/            # OrderJpaRepository
+│   ├── domain/                    # Order, OrderItem, OrderStatus
+│   ├── application/               # OrderFacade(Redis 락+도메인 조율), OrderService, (추후) OrderExpirationScheduler
+│   ├── dto/                       # OrderCreateRequest, OrderItemCreateRequest, OrderItemPricing, OrderResponse, OrderItemResponse
+│   ├── infrastructure/            # OrderJpaRepository, OrderItemJpaRepository
+│   └── interfaces/                # OrderController
 │
 ├── payment/
 │   ├── domain/                    # Payment Entity
@@ -82,7 +83,7 @@ src/
 │
 └── messaging/
     ├── domain/                    # Outbox, ConsumedEvent
-    ├── application/               # OutboxPublisher (폴링 퍼블리셔, 추후 Debezium CDC로 대체)
+    ├── application/                # OutboxPublisher (폴링 퍼블리셔, 추후 Debezium CDC로 대체)
     ├── event/                     # ProductCreatedEvent, OrderPaidEvent, OrderCancelledEvent
     └── kafka/                     # Producer, Consumer
 ```
