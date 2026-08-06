@@ -70,12 +70,20 @@ public class ProductService {
                 .toList();
     }
 
-    // OrderFacade
-    public Map<Long, ProductOption> getOptionsForOrder(List<Long> optionIds) {
+    /**
+     * OrderFacade가 주문 생성 전에 단가를 미리 계산하려고 호출함.
+     * ProductOption 엔티티를 그대로 반환하지 않고 여기서 가격 계산까지 끝내는 이유:
+     * ProductOption.product가 LAZY라서, 트랜잭션(=이 메서드) 밖으로 엔티티를 들고 나가면
+     * option.getProduct() 호출 시점에 세션이 이미 닫혀 LazyInitializationException이 남.
+     * 요청한 옵션 중 하나라도 존재하지 않으면 그 자리에서 막음.
+     */
+    public Map<Long, Integer> getUnitPrices(List<Long> optionIds) {
         List<ProductOption> options = productOptionJpaRepository.findAllById(optionIds);
         if (options.size() != optionIds.size()) {
             throw new IllegalArgumentException("존재하지 않는 상품 옵션이 포함되어 있습니다.");
         }
-        return options.stream().collect(Collectors.toMap(ProductOption::getId, Function.identity()));
+        return options.stream().collect(Collectors.toMap(
+                ProductOption::getId,
+                option -> option.getProduct().getBasePrice() + option.getAdditionalPrice()));
     }
 }
