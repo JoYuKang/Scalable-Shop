@@ -22,3 +22,6 @@ out/
 ### Local config / secrets ###
 .env
 application-local.yml
+
+### Docker local volumes (mysql/elasticsearch 데이터 파일 — 머신마다 생기는 바이너리라 커밋 대상 아님) ###
+data/
