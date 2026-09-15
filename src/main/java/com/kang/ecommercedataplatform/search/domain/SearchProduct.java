@@ -12,8 +12,8 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
  * MySQL Product를 원천으로 하는 읽기 전용 색인 문서.
- * product 도메인의 엔티티/enum을 참조하지 않고 값만 복사해 갖는다 - 읽기 쪽이 쓰기 쪽
- * 내부 타입에 의존하면 CQRS로 저장소를 분리한 의미가 없어지기 때문.
+ * product 도메인의 엔티티/enum을 직접 쓰지 않고 값만 복사해 담는다 — 그래야 product
+ * 쪽 타입이 바뀌어도 이 문서 구조는 영향을 안 받는다.
  */
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

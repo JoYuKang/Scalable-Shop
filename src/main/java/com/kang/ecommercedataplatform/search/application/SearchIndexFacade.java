@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * product(쓰기)와 search(읽기) 도메인을 조율. product 리포지토리를 직접 참조하지 않고
- * ProductService의 공개 API(getProduct/listProducts)만 거쳐 데이터를 가져온다 - 읽기 쪽이
- * 쓰기 쪽 내부 구현에 의존하면 CQRS로 저장소를 분리한 의미가 없기 때문.
+ * product(쓰기)와 search(읽기)를 잇는 유일한 연결점. product 리포지토리를 직접 쓰지 않고
+ * ProductService의 조회 API(getProduct/listProducts)만 거친다 — 그래야 product 쪽 내부
+ * 구조가 바뀌어도 이 클래스만 고치면 되고, search 쪽 코드는 안 건드려도 된다.
  */
 @Component
 @RequiredArgsConstructor
