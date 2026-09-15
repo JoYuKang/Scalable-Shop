@@ -50,6 +50,11 @@ public class SearchService {
         searchProductElasticsearchRepository.save(searchProduct);
     }
 
+    /** saveAll()은 건별 save()와 달리 ES Bulk API로 한 번에 보낸다 — 대량 색인은 이걸 써야 함. */
+    public void indexAll(List<SearchProduct> searchProducts) {
+        searchProductElasticsearchRepository.saveAll(searchProducts);
+    }
+
     public void delete(Long productId) {
         searchProductElasticsearchRepository.deleteById(productId);
     }
