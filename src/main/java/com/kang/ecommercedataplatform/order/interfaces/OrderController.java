@@ -12,16 +12,17 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderFacade orderFacade;
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<Void> createOrder(@RequestBody OrderCreateRequest request) {
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderCreateRequest request) {
         Long orderId = orderFacade.placeOrder(request);
-        return ResponseEntity.created(URI.create("/api/orders/" + orderId)).build();
+        return ResponseEntity.created(URI.create("/api/orders/" + orderId))
+                .body(orderService.getOrder(orderId));
     }
 
     @GetMapping("/{id}")

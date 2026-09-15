@@ -64,9 +64,10 @@ src/
 │
 ├── search/                        # [Query - Elasticsearch 전용]
 │   ├── domain/                    # SearchProduct
-│   ├── application/               # SearchService
+│   ├── application/               # SearchService(ES 리포지토리만 다룸), SearchIndexFacade(product 도메인과 조율)
 │   ├── dto/                       # SearchRequest, SearchResponse
-│   └── infrastructure/            # ElasticsearchRepository
+│   ├── infrastructure/            # SearchProductElasticsearchRepository
+│   └── interfaces/                # SearchController
 │
 ├── order/
 │   ├── domain/                    # Order, OrderItem, OrderStatus
@@ -107,7 +108,15 @@ pg_tid: Mock PG가 반환하는 가상 거래 ID
 status: READY / SUCCESS / FAILED / CANCELLED
 approved_at, fail_reason: 각각 승인 시각, 실패 사유 (Mock PG 결과에 따라 기록)
 
+## 🔍 검색
+
+`GET /api/search/products?keyword=...&categoryId=...&page=...&size=...`로 상품명을 검색합니다. 판매중(`ON_SALE`) 상품만 노출되며, 옵션별 재고를 합산한 `totalStock`을 함께 반환합니다.
+
+색인 갱신은 아직 이벤트 기반이 아니라 `POST /api/search/reindex`(MySQL 전체 재조회 후 덮어쓰기)로만 되어 있습니다. product/stock 변경을 Kafka로 흘려 색인을 자동 갱신하는 파이프라인은 다음 작업 항목이고, 그 전까지는 상품을 등록/변경해도 검색에 즉시 반영되지 않습니다 — 재색인을 수동으로 호출해야 합니다.
+
+한국어 형태소 분석(nori)·초성 검색은 인프라(도커 이미지)만 준비된 상태고, 인덱스 매핑에 커스텀 analyzer 적용은 아직 안 되어 있어 현재는 기본(standard) analyzer로 동작합니다. 부분어/조사 변형에 약하다는 걸 인지하고 있고, 다음 작업 항목으로 남겨뒀습니다.
+
 ## 🔍 검색-구매 시점 정합성
 
-Elasticsearch 조회 결과는 참고용입니다. MySQL의 재고 변경이 Kafka를 거쳐 색인에 반영되기까지 지연이 있을 수 있어, 검색 결과에는 재고가 있어 보여도 실제로는 이미 품절일 수 있습니다
+Elasticsearch 조회 결과는 참고용입니다. MySQL의 재고 변경이 색인에 반영되기까지 지연(현재는 수동 재색인 전까지 아예 반영 안 됨)이 있을 수 있어, 검색 결과에는 재고가 있어 보여도 실제로는 이미 품절일 수 있습니다.
 

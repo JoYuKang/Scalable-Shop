@@ -8,7 +8,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_USER=application
       - MYSQL_PASSWORD=application
-      - MYSQL_DATABASE=hhplus
+      - MYSQL_DATABASE=sshop
     volumes:
       - ./data/mysql/:/var/lib/mysql
     networks:
@@ -47,6 +47,33 @@ services:
       - zookeeper
     networks:
       - app_network
+
+  elasticsearch:
+    build:
+      context: ./docker/elasticsearch
+    container_name: elasticsearch
+    environment:
+      # single-node: 클러스터 구성 없이 로컬 개발용 단일 노드로 기동
+      - discovery.type=single-node
+      # 로컬 개발 전용 설정 — TLS/계정 없이 바로 붙기 위해 보안 기능을 끔.
+      # 실 운영이라면 xpack.security.enabled=true + 인증서/계정 설정이 필요함.
+      - xpack.security.enabled=false
+      # mysql/redis/kafka/zookeeper/influxdb/grafana와 한 머신에서 같이 띄우는 로컬
+      # 환경이라 힙을 제한. 다만 nori 성능 비교용으로 상품을 대량(수십만~100만 건)
+      # 색인할 계획이라 512m는 너무 타이트해서 1536m로 올림 (기본값은 훨씬 크게
+      # 잡아 리소스를 다 먹으니 무제한은 안 됨)
+      - ES_JAVA_OPTS=-Xms1536m -Xmx1536m
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./data/elasticsearch:/usr/share/elasticsearch/data
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   influxdb:
     image: influxdb:1.8

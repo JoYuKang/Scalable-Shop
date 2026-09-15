@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 import com.kang.ecommercedataplatform.product.infrastructure.ProductOptionJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +70,16 @@ public class ProductService {
         return productJpaRepository.findAll().stream()
                 .map(ProductResponse::from)
                 .toList();
+    }
+
+    /** 대량 재색인용 페이징 조회 — 옵션을 상품마다 lazy-load하지 않고 페이지 단위로 한 번에 배치 조회함. */
+    public Page<ProductResponse> listProducts(Pageable pageable) {
+        Page<Product> products = productJpaRepository.findAll(pageable);
+        List<Long> productIds = products.getContent().stream().map(Product::getId).toList();
+        Map<Long, List<ProductOption>> optionsByProductId = productOptionJpaRepository.findByProductIdIn(productIds).stream()
+                .collect(Collectors.groupingBy(option -> option.getProduct().getId()));
+        return products.map(product ->
+                ProductResponse.from(product, optionsByProductId.getOrDefault(product.getId(), List.of())));
     }
 
     /**
