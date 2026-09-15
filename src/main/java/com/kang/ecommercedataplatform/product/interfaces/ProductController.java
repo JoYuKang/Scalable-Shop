@@ -18,9 +18,10 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<Void> createProduct(@RequestBody ProductCreateRequest request) {
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductCreateRequest request) {
         Long productId = productService.createProduct(request);
-        return ResponseEntity.created(URI.create("/api/products/" + productId)).build();
+        return ResponseEntity.created(URI.create("/api/products/" + productId))
+                .body(productService.getProduct(productId));
     }
 
     @GetMapping("/{id}")
