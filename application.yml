@@ -9,6 +9,11 @@ spring:
       port: 6379
   elasticsearch:
     uris: http://localhost:9200
+  servlet:
+    multipart:
+      # 100만 행 CSV 벌크 업로드를 받으려면 기본값(1MB)으론 턱없이 부족함
+      max-file-size: 300MB
+      max-request-size: 300MB
 
 ---
 spring:
